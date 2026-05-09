@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bíblia Sagrada 365</title>
+    <style>
+        :root {
+            --ouro: #D4AF37;
+            --fundo: #000000;
+            --card: #151515;
+            --texto: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+        body { 
+            background-color: var(--fundo); 
+            color: var(--texto); 
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 450px; }
+
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 28px; color: var(--ouro); }
+        header p { color: #888; font-size: 14px; margin-top: 5px; }
+
+        /* Sorteio */
+        .caixa-sorteio {
+            background: var(--card);
+            border: 2px solid #333;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .promessa-texto { font-size: 20px; font-style: italic; margin-bottom: 15px; color: #eee; line-height: 1.4; }
+        .promessa-ref { color: var(--ouro); font-weight: bold; font-size: 16px; margin-bottom: 20px; display: block; }
+        
+        .btn-sortear {
+            background: #222; color: var(--ouro); border: 1px solid var(--ouro);
+            padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%;
+        }
+
+        /* Plano de Leitura */
+        .plano-leitura {
+            background: var(--ouro);
+            color: black;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+        .instrucao-leitura { font-size: 26px; font-weight: 900; margin-bottom: 20px; line-height: 1.2; min-height: 65px; }
+        .progresso-dia { font-size: 14px; font-weight: bold; margin-bottom: 25px; display: block; }
+
+        /* Botões de Ação */
+        .btn-concluir {
+            background: black;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-concluir:active { transform: scale(0.95); background: #333; }
+
+        /* Botão de Voltar (A correção solicitada) */
+        .btn-voltar {
+            background: rgba(0,0,0,0.2);
+            color: #444;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 14px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-voltar:active { background: white; color: black; }
+
+        .btn-reset { 
+            margin-top: 40px; background: none; border: none; color: #333; 
+            text-decoration: underline; cursor: pointer; font-size: 11px; width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Bíblia Sagrada</h1>
+        <p>Gênesis a Apocalipse</p>
+    </header>
+
+    <div class="caixa-sorteio">
+        <p class="promessa-texto" id="txt-sorteio">"Clique abaixo para uma promessa."</p>
+        <span class="promessa-ref" id="ref-sorteio">---</span>
+        <button class="btn-sortear" onclick="sortearVersiculo()">SORTEAR PROMESSA</button>
+    </div>
+
+    <div class="plano-leitura">
+        <span class="progresso-dia" id="info-dia">Dia 1 de 365</span>
+        <p class="instrucao-leitura" id="instrucao">Livro de Gênesis, <br>do Capítulo 1 ao 3</p>
+        
+        <button class="btn-concluir" onclick="proximoDia()">JÁ TERMINEI DE LER</button>
+        
+        <button class="btn-voltar" onclick="voltarDia()">CORRIGIR: VOLTAR UM DIA</button>
+    </div>
+
+    <button class="btn-reset" onclick="comecarDoZero()">Reiniciar do Dia 1</button>
+</div>
+
+<script>
+    const promessas = [
+        {t: "O Senhor é o meu pastor, nada me faltará.", r: "Salmos 23:1"},
+        {t: "Tudo posso naquele que me fortalece.", r: "Filipenses 4:13"},
+        {t: "Deus é o nosso refúgio e fortaleza.", r: "Salmos 46:1"},
+        {t: "A alegria do Senhor é a vossa força.", r: "Neemias 8:10"},
+        {t: "Lâmpada para os meus pés é tua palavra.", r: "Salmos 119:105"}
+    ];
+
+    const ordemBiblica = [
+        "Gênesis", "Êxodo", "Levítico", "Números", "Deuteronômio", "Josué", "Juízes", "Rute", 
+        "1 Samuel", "2 Samuel", "1 Reis", "2 Reis", "1 Crônicas", "2 Crônicas", "Esdras", "Neemias", "Ester",
+        "Jó", "Salmos", "Provérbios", "Eclesiastes", "Cantares", "Isaías", "Jeremias", "Lamentações", 
+        "Ezequiel", "Daniel", "Oséias", "Joel", "Amós", "Obadias", "Jonas", "Miquéias", "Naum", "Habacuque", 
+        "Sofonias", "Ageu", "Zacarias", "Malaquias", "Mateus", "Marcos", "Lucas", "João", "Atos", 
+        "Romanos", "1 Coríntios", "2 Coríntios", "Gálatas", "Efésios", "Filipenses", "Colossenses", 
+        "1 Tessalonicenses", "2 Tessalonicenses", "1 Timóteo", "2 Timóteo", "Tito", "Filemom", "Hebreus", 
+        "Tiago", "1 Pedro", "2 Pedro", "1 João", "2 João", "3 João", "Judas", "Apocalipse"
+    ];
+
+    let diaAtual = parseInt(localStorage.getItem('biblia_dia_vovó')) || 1;
+
+    function atualizarTela() {
+        document.getElementById('info-dia').innerText = "Você está no Dia " + diaAtual + " de 365";
+        
+        // Lógica de leitura clara
+        let livroIndex = Math.floor((diaAtual - 1) / 5.5); 
+        if (livroIndex >= ordemBiblica.length) livroIndex = ordemBiblica.length - 1;
+        
+        let livro = ordemBiblica[livroIndex];
+        let capInicio = ((diaAtual - 1) % 6) * 3 + 1;
+        let capFim = capInicio + 2;
+
+        document.getElementById('instrucao').innerHTML = "Livro de " + livro + ", <br>do Capítulo " + capInicio + " ao " + capFim;
+    }
+
+    function proximoDia() {
+        if (diaAtual < 365) {
+            diaAtual++;
+            salvar();
+        } else {
+            alert("Parabéns! Você completou a jornada bíblica!");
+        }
+    }
+
+    function voltarDia() {
+        if (diaAtual > 1) {
+            diaAtual--;
+            salvar();
+        } else {
+            alert("Você já está no começo do Gênesis.");
+        }
+    }
+
+    function salvar() {
+        localStorage.setItem('biblia_dia_vovó', diaAtual);
+        atualizarTela();
+    }
+
+    function sortearVersiculo() {
+        const sorteio = promessas[Math.floor(Math.random() * promessas.length)];
+        document.getElementById('txt-sorteio').innerText = '"' + sorteio.t + '"';
+        document.getElementById('ref-sorteio').innerText = sorteio.r;
+    }
+
+    function comecarDoZero() {
+        if (confirm("Quer mesmo voltar para o Dia 1?")) {
+            diaAtual = 1;
+            salvar();
+        }
+    }
+
+    atualizarTela();
+</script>
+
+</body>
+</html>
