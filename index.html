@@ -38,13 +38,15 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        .promessa-texto { font-size: 20px; font-style: italic; margin-bottom: 15px; color: #eee; line-height: 1.4; }
+        .promessa-texto { font-size: 20px; font-style: italic; margin-bottom: 15px; color: #eee; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         .promessa-ref { color: var(--ouro); font-weight: bold; font-size: 16px; margin-bottom: 20px; display: block; }
         
         .btn-sortear {
             background: #222; color: var(--ouro); border: 1px solid var(--ouro);
             padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%;
+            transition: 0.3s;
         }
+        .btn-sortear:active { background: var(--ouro); color: black; }
 
         /* Plano de Leitura */
         .plano-leitura {
@@ -72,11 +74,10 @@
         }
         .btn-concluir:active { transform: scale(0.95); background: #333; }
 
-        /* Botão de Voltar (A correção solicitada) */
         .btn-voltar {
-            background: rgba(0,0,0,0.2);
-            color: #444;
-            border: 1px solid #444;
+            background: rgba(0,0,0,0.1);
+            color: #222;
+            border: 1px solid rgba(0,0,0,0.2);
             padding: 10px;
             border-radius: 10px;
             width: 100%;
@@ -85,7 +86,6 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .btn-voltar:active { background: white; color: black; }
 
         .btn-reset { 
             margin-top: 40px; background: none; border: none; color: #333; 
@@ -102,30 +102,55 @@
     </header>
 
     <div class="caixa-sorteio">
-        <p class="promessa-texto" id="txt-sorteio">"Clique abaixo para uma promessa."</p>
+        <p class="promessa-texto" id="txt-sorteio">"Clique abaixo para tirar uma promessa do dia."</p>
         <span class="promessa-ref" id="ref-sorteio">---</span>
         <button class="btn-sortear" onclick="sortearVersiculo()">SORTEAR PROMESSA</button>
     </div>
 
     <div class="plano-leitura">
         <span class="progresso-dia" id="info-dia">Dia 1 de 365</span>
-        <p class="instrucao-leitura" id="instrucao">Livro de Gênesis, <br>do Capítulo 1 ao 3</p>
+        <p class="instrucao-leitura" id="instrucao">Carregando...</p>
         
         <button class="btn-concluir" onclick="proximoDia()">JÁ TERMINEI DE LER</button>
-        
         <button class="btn-voltar" onclick="voltarDia()">CORRIGIR: VOLTAR UM DIA</button>
     </div>
 
-    <button class="btn-reset" onclick="comecarDoZero()">Reiniciar do Dia 1</button>
+    <button class="btn-reset" onclick="comecarDoZero()">Reiniciar Plano (Dia 1)</button>
 </div>
 
 <script>
+    // Lista ampliada de promessas
     const promessas = [
         {t: "O Senhor é o meu pastor, nada me faltará.", r: "Salmos 23:1"},
         {t: "Tudo posso naquele que me fortalece.", r: "Filipenses 4:13"},
-        {t: "Deus é o nosso refúgio e fortaleza.", r: "Salmos 46:1"},
+        {t: "Deus é o nosso refúgio e fortaleza, socorro bem presente na angústia.", r: "Salmos 46:1"},
         {t: "A alegria do Senhor é a vossa força.", r: "Neemias 8:10"},
-        {t: "Lâmpada para os meus pés é tua palavra.", r: "Salmos 119:105"}
+        {t: "Lâmpada para os meus pés é tua palavra, e luz para o meu caminho.", r: "Salmos 119:105"},
+        {t: "Não fui eu que ordenei? Seja forte e corajoso! Não se apavore.", r: "Josué 1:9"},
+        {t: "Entregue o seu caminho ao Senhor; confie nele, e ele agirá.", r: "Salmos 37:5"},
+        {t: "O Senhor te abençoe e te guarde.", r: "Números 6:24"},
+        {t: "Lancem sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.", r: "1 Pedro 5:7"},
+        {t: "Pois eu bem sei os planos que tenho para vós, planos de paz.", r: "Jeremias 29:11"},
+        {t: "Sabemos que todas as coisas cooperam para o bem dos que amam a Deus.", r: "Romanos 8:28"},
+        {t: "O meu Deus suprirá todas as vossas necessidades.", r: "Filipenses 4:19"},
+        {t: "Clama a mim, e responder-te-ei, e anunciar-te-ei coisas grandes.", r: "Jeremias 33:3"},
+        {t: "Ainda que eu andasse pelo vale da sombra da morte, não temeria mal.", r: "Salmos 23:4"},
+        {t: "Peçam, e lhes será dado; busquem, e encontrarão.", r: "Mateus 7:7"},
+        {t: "Deixo-vos a paz, a minha paz vos dou; não a dou como o mundo a dá.", r: "João 14:27"},
+        {t: "Mil cairão ao teu lado, dez mil à tua direita, mas não chegará a ti.", r: "Salmos 91:7"},
+        {t: "O Senhor é bom, um refúgio em tempos de angústia.", r: "Naum 1:7"},
+        {t: "O choro pode durar uma noite, mas a alegria vem pela manhã.", r: "Salmos 30:5"},
+        {t: "Se Deus é por nós, quem será contra nós?", r: "Romanos 8:31"},
+        {t: "Vinde a mim, todos os que estais cansados, e eu vos aliviarei.", r: "Mateus 11:28"},
+        {t: "Aquele que habita no esconderijo do Altíssimo descansará.", r: "Salmos 91:1"},
+        {t: "Espera no Senhor, anima-te, e ele fortalecerá o teu coração.", r: "Salmos 27:14"},
+        {t: "Porque para Deus nada é impossível.", r: "Lucas 1:37"},
+        {t: "O coração em paz dá vida ao corpo.", r: "Provérbios 14:30"},
+        {t: "Deus é amor.", r: "1 João 4:8"},
+        {t: "O Senhor lutará por vocês; tão somente acalmem-se.", r: "Êxodo 14:14"},
+        {t: "Grandes coisas fez o Senhor por nós, por isso estamos alegres.", r: "Salmos 126:3"},
+        {t: "Seja a vossa moderação conhecida de todos os homens. Perto está o Senhor.", r: "Filipenses 4:5"},
+        {t: "Pela manhã ouve, Senhor, a minha voz.", r: "Salmos 5:3"}
     ];
 
     const ordemBiblica = [
@@ -144,8 +169,7 @@
     function atualizarTela() {
         document.getElementById('info-dia').innerText = "Você está no Dia " + diaAtual + " de 365";
         
-        // Lógica de leitura clara
-        let livroIndex = Math.floor((diaAtual - 1) / 5.5); 
+        let livroIndex = Math.floor((diaAtual - 1) / 5.6); 
         if (livroIndex >= ordemBiblica.length) livroIndex = ordemBiblica.length - 1;
         
         let livro = ordemBiblica[livroIndex];
@@ -169,7 +193,7 @@
             diaAtual--;
             salvar();
         } else {
-            alert("Você já está no começo do Gênesis.");
+            alert("Você já está no começo.");
         }
     }
 
